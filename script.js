@@ -1,44 +1,38 @@
 const fileInput = document.getElementById('file-input');
-const fileName = document.getElementById('file-name');
-const resetBtn = document.getElementById('reset-btn');
-const errorMsg = document.getElementById('error-msg');
+const fileNameElement = document.getElementById('file-name');
+const nextButton = document.getElementById('next-btn');
+const resetButton = document.getElementById('reset-btn');
+const errorElement = document.getElementById('error-msg');
 
-fileInput.addEventListener('change', () => {
+fileInput.addEventListener('change', (e) => {
     const file = fileInput.files[0];
-    if (file) {
-        fileName.textContent = file.name;
-        errorMsg.textContent = '';
-        printFile(file);
-    }
+    fileNameElement.textContent = file.name;
 });
 
-resetBtn.addEventListener('click', () => {
+nextButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    const file = fileInput.files[0];
+    if (!file) {
+        errorElement.textContent = 'Please select a file';
+        return;
+    }
+    const fileType = file.type;
+    if (!['image/jpeg', 'image/png', 'application/pdf', 'application/msword'].includes(fileType)) {
+        errorElement.textContent = 'Unsupported file type';
+        return;
+    }
+    // Send the file to the printer
+    printFile(file);
+});
+
+resetButton.addEventListener('click', (e) => {
+    e.preventDefault();
     fileInput.value = '';
-    fileName.textContent = '';
-    errorMsg.textContent = '';
+    fileNameElement.textContent = '';
+    errorElement.textContent = '';
 });
 
 function printFile(file) {
-    if (!['image/jpeg', 'image/png', 'application/pdf', 'application/msword'].includes(file.type)) {
-        errorMsg.textContent = 'Unsupported file type. Please upload a.jpg,.png,.pdf, or.docx file.';
-        return;
-    }
-    const fileReader = new FileReader();
-    fileReader.onload = () => {
-        const fileContent = fileReader.result;
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <html>
-                <head>
-                    <title>Print File</title>
-                </head>
-                <body>
-                    ${file.type === 'application/pdf'? `<embed src="${fileContent}" type="${file.type}" width="100%" height="100%">` : `<img src="${fileContent}" alt="${file.name}">`}
-                </body>
-            </html>
-        `);
-        printWindow.document.close();
-        printWindow.print();
-    };
-    fileReader.readAsDataURL(file);
+    // TO DO: Implement the logic to send the file to the printer
+    console.log('File sent to printer:', file.name);
 }
